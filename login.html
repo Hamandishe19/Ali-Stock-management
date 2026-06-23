@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <title>JDI Stock Management - Sign In</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            sky: {
+              primary: '#0284c7',
+              450: '#38bdf8'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="shared.css">
+  <script>
+    // If already logged in, redirect to dashboard
+    if (localStorage.getItem('is_logged_in') === 'true') {
+      window.location.replace('index.html');
+    }
+  </script>
+</head>
+<body class="relative overflow-x-hidden flex items-center justify-center min-height-screen py-16 px-4">
+  <div class="glow-bg"></div>
+
+  <!-- Main Login Panel -->
+  <div class="glass max-w-md w-full rounded-3xl overflow-hidden border border-white/10 shadow-2xl p-8 space-y-6">
+    
+    <!-- Branding Header -->
+    <div class="text-center space-y-2">
+      <div class="inline-block bg-gradient-to-tr from-sky-600 to-sky-400 p-3 rounded-2xl shadow-xl shadow-sky-900/40 mb-2">
+        <svg class="w-8 h-8 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+        </svg>
+      </div>
+      <h2 class="text-2xl font-extrabold tracking-wider bg-gradient-to-r from-sky-450 to-white bg-clip-text text-transparent">JDI STOCK MANAGEMENT</h2>
+      <p class="text-3xs tracking-widest text-slate-400 font-bold uppercase">PROCUREMENT & LOGISTICS DEPT.</p>
+    </div>
+
+    <!-- Active Operator Card -->
+    <div class="p-4 rounded-2xl bg-slate-900/40 border border-white/5 flex items-center space-x-3">
+      <div class="w-10 h-10 rounded-full bg-sky-500/10 flex items-center justify-center text-sky font-bold text-sm border border-sky-500/25">
+        A
+      </div>
+      <div class="flex-grow-1 flex-1">
+        <span class="text-3xs text-slate-400 block uppercase font-extrabold tracking-wider">Authorized Operator</span>
+        <span class="text-sm font-bold text-slate-200">ALI</span>
+      </div>
+      <span class="badge-online px-2 py-0.5 text-3xs font-extrabold rounded-full">ACTIVE WORKER</span>
+    </div>
+
+    <!-- Login Form -->
+    <form id="passcode-login-form" class="space-y-4">
+      <div>
+        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Passcode / PIN (Default: 1234) *</label>
+        <input type="password" id="passcode-input" placeholder="••••" required class="w-full text-center tracking-widest text-lg font-bold px-3 py-3 rounded-xl glass-input focus:outline-none">
+      </div>
+
+      <div class="flex items-center justify-between">
+        <label class="flex items-center space-x-2 text-xs text-slate-400 cursor-pointer select-none">
+          <input type="checkbox" id="remember-me" class="rounded bg-slate-900 border-white/10 text-sky-primary focus:ring-sky-500">
+          <span>Stay signed in</span>
+        </label>
+        
+        <button type="button" id="open-enroll-btn" class="text-xs text-sky hover:text-sky-300 font-semibold focus:outline-none transition">
+          Enroll Biometrics
+        </button>
+      </div>
+
+      <button type="submit" class="w-full py-3.5 rounded-xl font-bold bg-sky-primary text-white border border-sky-400/20 hover:bg-sky-600 transition shadow-lg shadow-sky-950/45">
+        Sign In with Passcode
+      </button>
+    </form>
+
+    <!-- Divider -->
+    <div class="relative flex py-2 items-center">
+      <div class="flex-grow border-t border-white/5"></div>
+      <span class="flex-shrink mx-4 text-3xs text-slate-500 uppercase tracking-widest font-extrabold">OR SECURE SCAN</span>
+      <div class="flex-grow border-t border-white/5"></div>
+    </div>
+
+    <!-- Biometric Actions Row -->
+    <button id="biometric-login-btn" class="w-full py-3.5 rounded-xl font-bold glass text-sky hover:text-sky-300 border border-sky-500/25 hover:border-sky-500/40 transition flex items-center justify-center space-x-2">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 009 11m-6.07 1.904a11.003 11.003 0 002.285 4.58M7.05 20.364a11.001 11.001 0 003.478-.397m-12 .562A10.994 10.994 0 011.1 13m0 0a10.998 10.998 0 013.003-7.662m0 0a10.993 10.993 0 002.172-1.055m1.968-.215A11.03 11.03 0 006.1 4m3.64-3.507A11.003 11.003 0 0012 2.1c1.2 0 2.33.193 3.4.551m-1.278 4.96a11.31 11.31 0 01-1.348-.198m0 0A11.21 11.21 0 0112 11.1m-.34-2.04c-.054-.09A13.916 13.916 0 0115 11c0 3.517 1.009 6.799 2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 0015 11"></path>
+      </svg>
+      <span>Biometric Sign-In</span>
+    </button>
+
+  </div>
+
+  <!-- MODAL: Enrollment Wizard -->
+  <div id="enrollment-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="glass-modal rounded-3xl w-full max-w-md overflow-hidden border border-white/10 shadow-2xl">
+      <div class="px-6 py-4 bg-slate-900/60 border-b border-white/10 flex items-center justify-between">
+        <h3 class="font-bold text-slate-100 text-sm flex items-center space-x-2">
+          <svg class="w-5 h-5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+          </svg>
+          <span>Enroll Biometric Credentials</span>
+        </h3>
+        <button id="close-enroll-btn" onclick="toggleModal('enrollment-modal', false)" class="text-slate-400 hover:text-white transition">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-6">
+        <p class="text-xs text-slate-300">Register face data or fingerprint credentials to bypass passcode entry on this device.</p>
+        
+        <div class="grid grid-cols-2 gap-4">
+          <button onclick="startSimulationEnrollment('face')" class="p-5 rounded-2xl bg-slate-900/40 border border-white/5 hover:border-sky-500/30 flex flex-col items-center justify-center text-center space-y-3 transition group">
+            <div class="bg-sky-500/10 p-3 rounded-full text-sky group-hover:scale-110 transition">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <span class="font-bold text-slate-200 text-xs">Setup Face ID</span>
+          </button>
+          
+          <button onclick="startSimulationEnrollment('finger')" class="p-5 rounded-2xl bg-slate-900/40 border border-white/5 hover:border-sky-500/30 flex flex-col items-center justify-center text-center space-y-3 transition group">
+            <div class="bg-sky-500/10 p-3 rounded-full text-sky group-hover:scale-110 transition">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 009 11m-6.07 1.904a11.003 11.003 0 002.285 4.58M7.05 20.364a11.001 11.001 0 003.478-.397m-12 .562A10.994 10.994 0 011.1 13m0 0a10.998 10.998 0 013.003-7.662m0 0a10.993 10.993 0 002.172-1.055m1.968-.215A11.03 11.03 0 006.1 4m3.64-3.507A11.003 11.003 0 0012 2.1c1.2 0 2.33.193 3.4.551m-1.278 4.96a11.31 11.31 0 01-1.348-.198m0 0A11.21 11.21 0 0112 11.1m-.34-2.04c-.054-.09A13.916 13.916 0 0115 11c0 3.517 1.009 6.799 2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 0015 11"></path>
+              </svg>
+            </div>
+            <span class="font-bold text-slate-200 text-xs">Setup Touch ID</span>
+          </button>
+        </div>
+        
+        <div class="text-center pt-2">
+          <button onclick="enrollWebAuthn()" class="text-2xs text-slate-400 hover:text-sky transition underline">
+            Or attempt secure native browser FIDO2 WebAuthn keys
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Custom Biometric SCANNER (Face or Fingerprint verification) -->
+  <div id="scanner-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md">
+    <div class="glass-modal rounded-3xl w-full max-w-sm overflow-hidden border border-sky-500/20 shadow-2xl p-6 text-center space-y-6">
+      
+      <div id="scanner-type-label" class="text-2xs font-extrabold text-sky tracking-widest uppercase">
+        AUTHENTICATING...
+      </div>
+
+      <!-- Face ID Camera Box Simulator -->
+      <div id="face-scanner-box" class="hidden relative w-48 h-48 mx-auto rounded-3xl overflow-hidden border-2 border-sky-500/30 bg-slate-900 shadow-inner">
+        <!-- Live stream placeholder or simulated face contour -->
+        <video id="scan-camera" class="w-full h-full object-cover hidden" autoplay playsinline></video>
+        <div id="scan-face-contour" class="absolute inset-0 flex items-center justify-center text-sky-500/40">
+          <svg class="w-32 h-32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <!-- Laser bar animation -->
+        <div class="scan-laser-line"></div>
+      </div>
+
+      <!-- Fingerprint Pad Simulator -->
+      <div id="finger-scanner-box" class="hidden relative w-32 h-32 mx-auto rounded-full flex items-center justify-center bg-slate-900/60 border border-white/5 cursor-pointer shadow-inner hover:border-sky-500/30 transition duration-300" onmousedown="onFingerprintTouchStart()" onmouseup="onFingerprintTouchEnd()" onmouseleave="onFingerprintTouchEnd()" ontouchstart="onFingerprintTouchStart()" ontouchend="onFingerprintTouchEnd()">
+        <div class="absolute inset-0 rounded-full bg-sky-500/5 animate-ping"></div>
+        <div class="text-sky fingerprint-scanner-pulse">
+          <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 009 11m-6.07 1.904a11.003 11.003 0 002.285 4.58M7.05 20.364a11.001 11.001 0 003.478-.397m-12 .562A10.994 10.994 0 011.1 13m0 0a10.998 10.998 0 013.003-7.662m0 0a10.993 10.993 0 002.172-1.055m1.968-.215A11.03 11.03 0 006.1 4m3.64-3.507A11.003 11.003 0 0012 2.1c1.2 0 2.33.193 3.4.551m-1.278 4.96a11.31 11.31 0 01-1.348-.198m0 0A11.21 11.21 0 0112 11.1m-.34-2.04c-.054-.09A13.916 13.916 0 0115 11c0 3.517 1.009 6.799 2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 0015 11"></path>
+          </svg>
+        </div>
+      </div>
+
+      <div class="space-y-1">
+        <h4 id="scanner-instruction" class="text-sm font-bold text-slate-200">Starting scanner...</h4>
+        <p id="scanner-sub-instruction" class="text-xs text-slate-400">Position your face in the camera frame</p>
+      </div>
+
+      <!-- Scan Bar Progress -->
+      <div class="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden">
+        <div id="scan-progress-bar" class="bg-sky h-full w-0 transition-all duration-100"></div>
+      </div>
+
+      <button id="cancel-scan-btn" onclick="cancelScanning()" class="py-2 px-4 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition">
+        Cancel Scan
+      </button>
+
+    </div>
+  </div>
+
+  <!-- MODAL: Enrollment Success Feedback -->
+  <div id="enrollment-status-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="glass-modal rounded-3xl w-full max-w-sm overflow-hidden p-6 text-center border border-white/10 shadow-2xl space-y-4">
+      <div class="mx-auto w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <div>
+        <h4 id="enroll-success-title" class="font-bold text-slate-100">Enrollment Complete</h4>
+        <p id="enroll-success-desc" class="text-xs text-slate-400 mt-1">Biometrics configured successfully.</p>
+      </div>
+      <button onclick="toggleModal('enrollment-status-modal', false)" class="w-full py-2.5 rounded-xl font-bold bg-sky-primary text-white border border-sky-400/20 hover:bg-sky-600 transition">
+        Understood
+      </button>
+    </div>
+  </div>
+
+  <!-- Global Toast Alert Container -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 max-w-sm w-full"></div>
+
+  <!-- Logic scripts -->
+  <script src="db.js"></script>
+  
+  <script>
+    // Local Page DOM Helpers
+    function toggleModal(id, show) {
+      const modal = document.getElementById(id);
+      if (!modal) return;
+      if (show) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    // Modal Bindings
+    document.getElementById('open-enroll-btn').addEventListener('click', () => toggleModal('enrollment-modal', true));
+    
+    // --- Passcode Auth Flow ---
+    const loginForm = document.getElementById('passcode-login-form');
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const code = document.getElementById('passcode-input').value;
+      const remember = document.getElementById('remember-me').checked;
+      
+      if (code === '1234') {
+        executeLogin(remember);
+      } else {
+        showLocalToast('Incorrect passcode. Try 1234.', 'error');
+      }
+    });
+
+    function executeLogin(remember) {
+      localStorage.setItem('is_logged_in', 'true');
+      localStorage.setItem('remember_me', remember ? 'true' : 'false');
+      showLocalToast('Authentication successful. Redirecting...', 'success');
+      setTimeout(() => {
+        window.location.replace('index.html');
+      }, 1000);
+    }
+
+    // --- Toast Helper (Duplicate for isolated login context) ---
+    function showLocalToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = `glass px-6 py-4 rounded-xl shadow-2xl flex items-center justify-between border-l-4 transition-all duration-300 transform translate-y-10 opacity-0 max-w-md w-full mb-3`;
+      if (type === 'success') {
+        toast.classList.add('border-emerald-500', 'text-emerald-400');
+        toast.innerHTML = `<span class="text-sm font-medium text-slate-200">${message}</span>`;
+      } else if (type === 'warning') {
+        toast.classList.add('border-amber-500', 'text-amber-400');
+        toast.innerHTML = `<span class="text-sm font-medium text-slate-200">${message}</span>`;
+      } else {
+        toast.classList.add('border-red-500', 'text-red-400');
+        toast.innerHTML = `<span class="text-sm font-medium text-slate-200">${message}</span>`;
+      }
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.remove('translate-y-10', 'opacity-0'), 10);
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'scale-95');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // --- Biometric Enroller Simulation ---
+    let activeEnrollType = null;
+    let enrollProgressTimer = null;
+    
+    function startSimulationEnrollment(type) {
+      toggleModal('enrollment-modal', false);
+      activeEnrollType = type;
+      
+      const scannerModal = document.getElementById('scanner-modal');
+      const scannerTypeLabel = document.getElementById('scanner-type-label');
+      const scanInstruction = document.getElementById('scanner-instruction');
+      const scanSubInstruction = document.getElementById('scanner-sub-instruction');
+      const faceBox = document.getElementById('face-scanner-box');
+      const fingerBox = document.getElementById('finger-scanner-box');
+      const bar = document.getElementById('scan-progress-bar');
+      
+      bar.style.width = '0%';
+      scannerTypeLabel.textContent = `ENROLLING BIOMETRIC ${type.toUpperCase()}`;
+      toggleModal('scanner-modal', true);
+
+      if (type === 'face') {
+        faceBox.classList.remove('hidden');
+        fingerBox.classList.add('hidden');
+        scanInstruction.textContent = "Scanning face features...";
+        scanSubInstruction.textContent = "Hold still in front of your device camera";
+        
+        // Start device camera preview if possible
+        startEnrollCamera();
+        
+        // Automated face scan enrollment simulator
+        let progress = 0;
+        enrollProgressTimer = setInterval(() => {
+          progress += 5;
+          bar.style.width = `${progress}%`;
+          if (progress >= 100) {
+            clearInterval(enrollProgressTimer);
+            stopEnrollCamera();
+            saveBiometricDetails('face');
+          }
+        }, 150);
+      } else {
+        faceBox.classList.add('hidden');
+        fingerBox.classList.remove('hidden');
+        scanInstruction.textContent = "Press and HOLD the scanner pad";
+        scanSubInstruction.textContent = "Maintain contact to capture print";
+      }
+    }
+
+    // Fingerprint Touch Hold Enroll triggers
+    let touchHoldProgress = 0;
+    let touchHoldTimer = null;
+
+    function onFingerprintTouchStart() {
+      if (!activeEnrollType && localStorage.getItem('biometric_enrolled') !== 'true') return;
+      
+      const scanInstruction = document.getElementById('scanner-instruction');
+      const bar = document.getElementById('scan-progress-bar');
+      
+      scanInstruction.textContent = "Reading print data...";
+      
+      touchHoldTimer = setInterval(() => {
+        touchHoldProgress += 8;
+        if (touchHoldProgress > 100) touchHoldProgress = 100;
+        bar.style.width = `${touchHoldProgress}%`;
+        
+        if (touchHoldProgress >= 100) {
+          clearInterval(touchHoldTimer);
+          if (activeEnrollType) {
+            saveBiometricDetails('finger');
+          } else {
+            // Authentic success log
+            executeBiometricLoginSuccess();
+          }
+        }
+      }, 120);
+    }
+
+    function onFingerprintTouchEnd() {
+      if (touchHoldTimer) {
+        clearInterval(touchHoldTimer);
+      }
+      
+      // If we didn't complete, prompt to hold again
+      if (touchHoldProgress < 100) {
+        const scanInstruction = document.getElementById('scanner-instruction');
+        const bar = document.getElementById('scan-progress-bar');
+        
+        scanInstruction.textContent = "Print lift detected! Hold again";
+        touchHoldProgress = 0;
+        bar.style.width = '0%';
+      }
+    }
+
+    function saveBiometricDetails(type) {
+      toggleModal('scanner-modal', false);
+      localStorage.setItem('biometric_enrolled', 'true');
+      localStorage.setItem('biometric_type', type);
+      
+      document.getElementById('enroll-success-title').textContent = 'Enrollment Successful';
+      document.getElementById('enroll-success-desc').textContent = `${type === 'face' ? 'Face ID' : 'Touch ID'} biometrics registered locally for ALI.`;
+      toggleModal('enrollment-status-modal', true);
+      
+      // Reset variables
+      activeEnrollType = null;
+      touchHoldProgress = 0;
+    }
+
+    // Camera details for enrollment simulation
+    let streamRef = null;
+    function startEnrollCamera() {
+      const video = document.getElementById('scan-camera');
+      const contour = document.getElementById('scan-face-contour');
+      
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+          streamRef = stream;
+          if (video) {
+            video.srcObject = stream;
+            video.classList.remove('hidden');
+          }
+          if (contour) contour.classList.add('hidden');
+        })
+        .catch(err => {
+          console.warn("Camera streaming not supported or blocked. Showing graphic.", err);
+          if (video) video.classList.add('hidden');
+          if (contour) contour.classList.remove('hidden');
+        });
+    }
+
+    function stopEnrollCamera() {
+      if (streamRef) {
+        streamRef.getTracks().forEach(track => track.stop());
+        streamRef = null;
+      }
+      const video = document.getElementById('scan-camera');
+      if (video) {
+        video.srcObject = null;
+        video.classList.add('hidden');
+      }
+    }
+
+    // Cancel Scanning
+    function cancelScanning() {
+      if (enrollProgressTimer) clearInterval(enrollProgressTimer);
+      if (touchHoldTimer) clearInterval(touchHoldTimer);
+      stopEnrollCamera();
+      toggleModal('scanner-modal', false);
+      activeEnrollType = null;
+      touchHoldProgress = 0;
+      showLocalToast('Biometric scanning cancelled.', 'warning');
+    }
+
+    // --- WebAuthn Native Enrollment Mock ---
+    function enrollWebAuthn() {
+      toggleModal('enrollment-modal', false);
+      if (!window.PublicKeyCredential) {
+        showLocalToast('FIDO2 WebAuthn is not supported by your browser.', 'error');
+        return;
+      }
+      
+      showLocalToast('Requesting hardware key creation...', 'warning');
+      
+      // Basic mock WebAuthn registration parameters
+      const challenge = new Uint8Array(32);
+      window.crypto.getRandomValues(challenge);
+      const publicKey = {
+        challenge: challenge,
+        rp: { name: "JDI Stock Management" },
+        user: {
+          id: new Uint8Array([1, 2, 3, 4]),
+          name: "ali@jdi.org",
+          displayName: "ALI"
+        },
+        pubKeyCredParams: [{ alg: -7, type: "public-key" }],
+        timeout: 60000,
+        attestation: "direct"
+      };
+
+      navigator.credentials.create({ publicKey })
+        .then(cred => {
+          console.log("WebAuthn mock registration success:", cred);
+          localStorage.setItem('biometric_enrolled', 'true');
+          localStorage.setItem('biometric_type', 'webauthn');
+          showLocalToast('Native WebAuthn token registered successfully!', 'success');
+        })
+        .catch(err => {
+          console.error("WebAuthn registration failed/cancelled:", err);
+          // Standard on insecure contexts/cancel
+          showLocalToast('Native key failed. Reverting to simulator.', 'warning');
+          setTimeout(() => {
+            toggleModal('enrollment-modal', true);
+          }, 1000);
+        });
+    }
+
+    // --- Biometric Authentication Execution ---
+    document.getElementById('biometric-login-btn').addEventListener('click', () => {
+      const enrolled = localStorage.getItem('biometric_enrolled') === 'true';
+      if (!enrolled) {
+        showLocalToast('No biometrics enrolled. Please input passcode and register first.', 'error');
+        toggleModal('enrollment-modal', true);
+        return;
+      }
+
+      const type = localStorage.getItem('biometric_type');
+      
+      if (type === 'webauthn') {
+        executeWebAuthnLogin();
+      } else {
+        executeSimulationLogin(type);
+      }
+    });
+
+    // Native assertion check
+    function executeWebAuthnLogin() {
+      const challenge = new Uint8Array(32);
+      window.crypto.getRandomValues(challenge);
+      const publicKey = {
+        challenge: challenge,
+        timeout: 60000,
+        rpId: window.location.hostname
+      };
+
+      navigator.credentials.get({ publicKey })
+        .then(assertion => {
+          console.log("WebAuthn mock authentication success:", assertion);
+          executeBiometricLoginSuccess();
+        })
+        .catch(err => {
+          console.error("WebAuthn assertion failed:", err);
+          showLocalToast("WebAuthn cancelled. Fallback to simulator.", "warning");
+          // Fallback to fingerprint simulator
+          executeSimulationLogin('finger');
+        });
+    }
+
+    // Simulation Login
+    function executeSimulationLogin(type) {
+      activeEnrollType = null; // Mark as auth, not enroll
+      
+      const scannerModal = document.getElementById('scanner-modal');
+      const scannerTypeLabel = document.getElementById('scanner-type-label');
+      const scanInstruction = document.getElementById('scanner-instruction');
+      const scanSubInstruction = document.getElementById('scanner-sub-instruction');
+      const faceBox = document.getElementById('face-scanner-box');
+      const fingerBox = document.getElementById('finger-scanner-box');
+      const bar = document.getElementById('scan-progress-bar');
+      
+      bar.style.width = '0%';
+      scannerTypeLabel.textContent = `VERIFYING IDENTITY: ${type.toUpperCase()}`;
+      toggleModal('scanner-modal', true);
+
+      if (type === 'face') {
+        faceBox.classList.remove('hidden');
+        fingerBox.classList.add('hidden');
+        scanInstruction.textContent = "Scanning face matches...";
+        scanSubInstruction.textContent = "Fit your face in the camera frame";
+        
+        startEnrollCamera();
+        
+        let progress = 0;
+        enrollProgressTimer = setInterval(() => {
+          progress += 10;
+          bar.style.width = `${progress}%`;
+          if (progress >= 100) {
+            clearInterval(enrollProgressTimer);
+            stopEnrollCamera();
+            executeBiometricLoginSuccess();
+          }
+        }, 150);
+      } else {
+        faceBox.classList.add('hidden');
+        fingerBox.classList.remove('hidden');
+        scanInstruction.textContent = "Press and HOLD to verify fingerprint";
+        scanSubInstruction.textContent = "Place registered finger on scanner pad";
+      }
+    }
+
+    function executeBiometricLoginSuccess() {
+      toggleModal('scanner-modal', false);
+      const remember = document.getElementById('remember-me').checked;
+      executeLogin(remember);
+    }
+  </script>
+</body>
+</html>
