@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hardware-stock-v2';
+const CACHE_NAME = 'hardware-stock-v3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ const ASSETS_TO_CACHE = [
   './transaction.html',
   './history.html',
   './shared.css',
+  './auth.js',
   './db.js',
   './db-init-data.js',
   './app.js',
