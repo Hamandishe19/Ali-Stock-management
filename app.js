@@ -7,12 +7,7 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// --- Application Route Guard ---
-const pathName = window.location.pathname;
-const currentPage = pathName.split('/').pop() || 'index.html';
-if (currentPage !== 'login.html' && localStorage.getItem('is_logged_in') !== 'true') {
-  window.location.replace('login.html');
-}
+// --- Application Route Guard (handled by auth.js) ---
 
 // --- Application State ---
 const AppState = {
@@ -230,8 +225,8 @@ async function rollbackStockSnapshots(stockSnapshots) {
 async function saveTransaction(txData) {
   const { 
     items, direction, 
-    authorisedBy, receivedBy, deliveredBy,
-    signatureAuthorised, signatureReceived, signatureDelivered,
+    authorisedBy, receivedBy, deliveredBy, inspectedBy,
+    signatureAuthorised, signatureReceived, signatureDelivered, signatureInspected,
     memo, reference, jtOrden
   } = txData;
   
@@ -250,8 +245,9 @@ async function saveTransaction(txData) {
       let newQty = item.quantity;
       if (direction === 'in') {
         newQty += cartItem.quantity;
+        // Over-capacity is allowed (user was warned at cart stage); just log it
         if (newQty > item.maxCapacity) {
-          throw new Error(`Cannot receive ${cartItem.quantity} unit(s) of ${item.name}. Max capacity is ${item.maxCapacity} (current: ${item.quantity}).`);
+          console.warn(`Stock In for "${item.name}" exceeds max capacity (${item.maxCapacity}). New qty will be ${newQty}.`);
         }
       } else {
         if (item.quantity < cartItem.quantity) {
@@ -273,9 +269,11 @@ async function saveTransaction(txData) {
       authorisedBy,
       receivedBy,
       deliveredBy,
+      inspectedBy: inspectedBy || '',
       signatureAuthorised,
       signatureReceived,
       signatureDelivered,
+      signatureInspected: signatureInspected || '',
       memo: memo || '',
       reference: reference || '',
       jtOrden: jtOrden || '',
@@ -283,6 +281,7 @@ async function saveTransaction(txData) {
       personB: authorisedBy,
       signatureA: signatureDelivered,
       signatureB: signatureAuthorised || 'pin_verified',
+      pinVerified: true,
       timestamp: Date.now()
     };
     
@@ -349,10 +348,7 @@ function renderUserSelector() {
 }
 
 function signOut() {
-  localStorage.removeItem('is_logged_in');
-  if (localStorage.getItem('remember_me') !== 'true') {
-    localStorage.removeItem('remember_me');
-  }
+  window.Auth.signOut();
   showToast('Signing out...', 'warning');
   setTimeout(() => {
     window.location.replace('login.html');
@@ -784,8 +780,9 @@ let savedSignatures = {
   'received': null,
   'delivered': null,
   'gin-authorised': null,
-  'gin-received': null,
-  'gin-delivered': null
+  'gin-inspected': null,
+  'gin-delivered': null,
+  'gin-received': null
 };
 let signatureCanvas = null;
 let signatureCtx = null;
@@ -845,6 +842,28 @@ async function addItemToCart() {
     }
     
     const existingIndex = transactionCart.findIndex(i => i.id === sku);
+
+    // --- Stock Out: block if requested qty exceeds available stock ---
+    if (currentTransactionDirection === 'out') {
+      const alreadyInCart = existingIndex > -1 ? transactionCart[existingIndex].quantity : 0;
+      const totalRequestedQty = alreadyInCart + qty;
+      if (totalRequestedQty > item.quantity) {
+        const remaining = item.quantity - alreadyInCart;
+        if (remaining <= 0) {
+          showToast(
+            `Cannot add to voucher — no remaining stock for "${item.name}". Available: ${item.quantity}, already in list: ${alreadyInCart}.`,
+            'error'
+          );
+        } else {
+          showToast(
+            `Insufficient stock for "${item.name}". You requested ${qty} but only ${remaining} more unit(s) can be issued (stock: ${item.quantity}, already listed: ${alreadyInCart}).`,
+            'error'
+          );
+        }
+        return;
+      }
+    }
+
     if (existingIndex > -1) {
       transactionCart[existingIndex].quantity += qty;
     } else {
@@ -857,19 +876,19 @@ async function addItemToCart() {
       });
     }
 
+    // --- Stock In: allow above max capacity but warn the user ---
     if (currentTransactionDirection === 'in') {
       const cartQty = transactionCart.find(i => i.id === sku).quantity;
       const projectedTotal = item.quantity + cartQty;
       if (projectedTotal > item.maxCapacity) {
-        showToast(`Receiving ${cartQty} would exceed max capacity (${item.maxCapacity}). Current stock: ${item.quantity}.`, 'error');
-        if (existingIndex > -1) {
-          transactionCart[existingIndex].quantity -= qty;
-          if (transactionCart[existingIndex].quantity <= 0) {
-            transactionCart.splice(existingIndex, 1);
-          }
-        } else {
-          transactionCart.pop();
-        }
+        showToast(
+          `Warning: Receiving ${cartQty} unit(s) of "${item.name}" will exceed the max capacity of ${item.maxCapacity} (projected: ${projectedTotal}). Item added - proceed with caution.`,
+          'warning'
+        );
+        renderCart();
+        qtyInput.value = 1;
+        select.value = '';
+        document.getElementById('selected-item-details').classList.add('hidden');
         return;
       }
     }
@@ -902,8 +921,9 @@ function openSignatureModal(role) {
     'received': 'Draw Received By Signature',
     'delivered': 'Draw Delivered By Signature',
     'gin-authorised': 'Draw Authorised By Signature (GIN)',
-    'gin-received': 'Draw Received By Signature (GIN)',
-    'gin-delivered': 'Draw Delivered By Signature (GIN)'
+    'gin-inspected': 'Draw Inspected By Signature (GIN)',
+    'gin-delivered': 'Draw Delivered By Signature (GIN)',
+    'gin-received': 'Draw Received By Signature (GIN)'
   };
   
   if (modal) {
@@ -958,8 +978,9 @@ function saveSignatureCanvas() {
     'received': 'received-sig-container',
     'delivered': 'delivered-sig-container',
     'gin-authorised': 'gin-authorised-sig-container',
-    'gin-received': 'gin-received-sig-container',
-    'gin-delivered': 'gin-delivered-sig-container'
+    'gin-inspected': 'gin-inspected-sig-container',
+    'gin-delivered': 'gin-delivered-sig-container',
+    'gin-received': 'gin-received-sig-container'
   };
   
   const containerId = containerMap[activeSignatureRole];
@@ -1072,21 +1093,22 @@ async function initTransaction() {
 function resetAllSignatures() {
   savedSignatures = {
     'authorised': null, 'received': null, 'delivered': null,
-    'gin-authorised': null, 'gin-received': null, 'gin-delivered': null
+    'gin-authorised': null, 'gin-inspected': null, 'gin-delivered': null, 'gin-received': null
   };
   const sigContainerIds = [
     'authorised-sig-container', 'received-sig-container', 'delivered-sig-container',
-    'gin-authorised-sig-container', 'gin-received-sig-container', 'gin-delivered-sig-container'
+    'gin-authorised-sig-container', 'gin-inspected-sig-container', 'gin-delivered-sig-container', 'gin-received-sig-container'
   ];
   const sigLabels = [
     'Tap to Draw Authorised By Signature',
     'Tap to Draw Received By Signature',
     'Tap to Draw Delivered By Signature',
     'Tap to Draw Authorised By Signature',
-    'Tap to Draw Received By Signature',
-    'Tap to Draw Delivered By Signature'
+    'Tap to Draw Inspected By Signature',
+    'Tap to Draw Delivered By Signature',
+    'Tap to Draw Received By Signature'
   ];
-  const onclickRoles = ['authorised', 'received', 'delivered', 'gin-authorised', 'gin-received', 'gin-delivered'];
+  const onclickRoles = ['authorised', 'received', 'delivered', 'gin-authorised', 'gin-inspected', 'gin-delivered', 'gin-received'];
   
   sigContainerIds.forEach((id, i) => {
     const el = document.getElementById(id);
@@ -1164,18 +1186,6 @@ function setupTransactionFormHandlers() {
         showToast('Incorrect staff authorization passcode PIN.', 'error');
         return;
       }
-      if (!savedSignatures['authorised']) {
-        showToast('Please draw the Authorised By signature.', 'error');
-        return;
-      }
-      if (!savedSignatures['received']) {
-        showToast('Please draw the Received By signature.', 'error');
-        return;
-      }
-      if (!savedSignatures['delivered']) {
-        showToast('Please draw the Delivered By signature.', 'error');
-        return;
-      }
       
       const res = await saveTransaction({
         items: [...transactionCart],
@@ -1208,8 +1218,9 @@ function setupTransactionFormHandlers() {
       e.preventDefault();
       
       const authorisedBy = document.getElementById('gin-authorised-by').value.trim();
-      const receivedBy = document.getElementById('gin-received-by').value.trim();
+      const inspectedBy = document.getElementById('gin-inspected-by').value.trim();
       const deliveredBy = document.getElementById('gin-delivered-by').value.trim();
+      const receivedBy = document.getElementById('gin-received-by').value.trim();
       const pin = document.getElementById('gin-auth-pin').value;
       const memo = document.getElementById('gin-memo').value.trim();
       const reference = document.getElementById('gin-reference').value.trim();
@@ -1219,24 +1230,12 @@ function setupTransactionFormHandlers() {
         showToast('Please add at least one item to the voucher list.', 'error');
         return;
       }
-      if (!authorisedBy || !receivedBy || !deliveredBy || !pin) {
+      if (!authorisedBy || !inspectedBy || !deliveredBy || !receivedBy || !pin) {
         showToast('Please fill out all mandatory fields (names and PIN).', 'error');
         return;
       }
       if (pin !== '1234') {
         showToast('Incorrect staff authorization passcode PIN.', 'error');
-        return;
-      }
-      if (!savedSignatures['gin-authorised']) {
-        showToast('Please draw the Authorised By signature.', 'error');
-        return;
-      }
-      if (!savedSignatures['gin-received']) {
-        showToast('Please draw the Received By signature.', 'error');
-        return;
-      }
-      if (!savedSignatures['gin-delivered']) {
-        showToast('Please draw the Delivered By signature.', 'error');
         return;
       }
       
@@ -1257,9 +1256,11 @@ function setupTransactionFormHandlers() {
         items: [...transactionCart],
         direction: 'out',
         authorisedBy,
+        inspectedBy,
         receivedBy,
         deliveredBy,
         signatureAuthorised: savedSignatures['gin-authorised'],
+        signatureInspected: savedSignatures['gin-inspected'],
         signatureReceived: savedSignatures['gin-received'],
         signatureDelivered: savedSignatures['gin-delivered'],
         memo,
@@ -1521,37 +1522,140 @@ async function openReceiptModal(txId) {
       }
     }
     
-    // Names
-    const authorisedName = tx.authorisedBy || tx.personB || '—';
-    const receivedName = tx.receivedBy || '—';
-    const deliveredName = tx.deliveredBy || tx.personA || '—';
-    
-    const elAuthName = document.getElementById('receipt-authorised-name');
-    const elRecvName = document.getElementById('receipt-received-name');
-    const elDelvName = document.getElementById('receipt-delivered-name');
-    if (elAuthName) elAuthName.textContent = authorisedName;
-    if (elRecvName) elRecvName.textContent = receivedName;
-    if (elDelvName) elDelvName.textContent = deliveredName;
-    
-    // Signatures
-    const sigMap = [
-      { imgId: 'receipt-sig-authorised-img', sig: tx.signatureAuthorised || tx.signatureB },
-      { imgId: 'receipt-sig-received-img', sig: tx.signatureReceived },
-      { imgId: 'receipt-sig-delivered-img', sig: tx.signatureDelivered || tx.signatureA }
-    ];
-    
-    sigMap.forEach(({ imgId, sig }) => {
-      const img = document.getElementById(imgId);
-      if (img) {
-        if (sig && !sig.startsWith('verified')) {
-          img.src = sig;
-          img.style.display = 'block';
-        } else {
-          img.src = '';
-          img.style.display = 'none';
+    // Dynamic Signatures Rendering
+    const sigContainer = document.getElementById('receipt-signatures-container');
+    if (sigContainer) {
+      const getSigImgHTML = (sig, roleLabel) => {
+        if (window.Auth && window.Auth.isDisplayableSignature(sig)) {
+          return `<img style="max-height:34px;max-width:100%;filter:invert(1);" src="${sig}" alt="${roleLabel} Signature" />`;
         }
+        return '';
+      };
+
+      if (isIn) {
+        // GRV (Stock In): 3 Signatures
+        // Authorised By: Mr S. I. Johnson, Received By: Ali, Delivered By: tx.deliveredBy
+        const authorisedName = tx.authorisedBy || 'Mr S. I. Johnson';
+        const receivedName = tx.receivedBy || 'Ali';
+        const deliveredName = tx.deliveredBy || tx.personA || '—';
+        const sigAuth = tx.signatureAuthorised || tx.signatureB;
+        const sigRecv = tx.signatureReceived;
+        const sigDelv = tx.signatureDelivered || tx.signatureA;
+
+        sigContainer.innerHTML = `
+          <!-- Authorised By -->
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+              <span style="font-size:9px;font-weight:700;color:#1e293b;white-space:nowrap;width:90px;">Authorised By:</span>
+              <span style="font-size:10px;font-weight:600;color:#0284c7;border-bottom:1px solid #cbd5e1;flex:1;min-width:100px;padding-bottom:1px;">${authorisedName}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:9px;font-weight:700;color:#1e293b;white-space:nowrap;width:90px;">Signature:</span>
+              <div style="border-bottom:1px solid #cbd5e1;flex:1;min-width:100px;height:36px;display:flex;align-items:center;justify-content:center;">
+                ${getSigImgHTML(sigAuth, 'Authorised By')}
+              </div>
+            </div>
+          </div>
+
+          <!-- Received By -->
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+              <span style="font-size:9px;font-weight:700;color:#1e293b;white-space:nowrap;width:90px;">Received By:</span>
+              <span style="font-size:10px;font-weight:600;color:#0284c7;border-bottom:1px solid #cbd5e1;flex:1;min-width:100px;padding-bottom:1px;">${receivedName}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:9px;font-weight:700;color:#1e293b;white-space:nowrap;width:90px;">Signature:</span>
+              <div style="border-bottom:1px solid #cbd5e1;flex:1;min-width:100px;height:36px;display:flex;align-items:center;justify-content:center;">
+                ${getSigImgHTML(sigRecv, 'Received By')}
+              </div>
+            </div>
+          </div>
+
+          <!-- Delivered By -->
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+              <span style="font-size:9px;font-weight:700;color:#1e293b;white-space:nowrap;width:90px;">Delivered By:</span>
+              <span style="font-size:10px;font-weight:600;color:#0284c7;border-bottom:1px solid #cbd5e1;flex:1;min-width:100px;padding-bottom:1px;">${deliveredName}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:9px;font-weight:700;color:#1e293b;white-space:nowrap;width:90px;">Signature:</span>
+              <div style="border-bottom:1px solid #cbd5e1;flex:1;min-width:100px;height:36px;display:flex;align-items:center;justify-content:center;">
+                ${getSigImgHTML(sigDelv, 'Delivered By')}
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        // GIN (Stock Out): 4 Signatures
+        // Authorised By: Mr S. I. Johnson, Inspected By: Ali, Delivered By: variable, Received By: variable
+        const authorisedName = tx.authorisedBy || 'Mr S. I. Johnson';
+        const inspectedName = tx.inspectedBy || 'Ali';
+        const deliveredName = tx.deliveredBy || tx.personA || '—';
+        const receivedName = tx.receivedBy || '—';
+        const sigAuth = tx.signatureAuthorised || tx.signatureB;
+        const sigInspect = tx.signatureInspected;
+        const sigDelv = tx.signatureDelivered;
+        const sigRecv = tx.signatureReceived || tx.signatureA;
+
+        sigContainer.innerHTML = `
+          <!-- Authorised By -->
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+              <span style="font-size:9px;font-weight:700;color:#1e293b;white-space:nowrap;width:90px;">Authorised By:</span>
+              <span style="font-size:10px;font-weight:600;color:#0284c7;border-bottom:1px solid #cbd5e1;flex:1;min-width:100px;padding-bottom:1px;">${authorisedName}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:9px;font-weight:700;color:#1e293b;white-space:nowrap;width:90px;">Signature:</span>
+              <div style="border-bottom:1px solid #cbd5e1;flex:1;min-width:100px;height:36px;display:flex;align-items:center;justify-content:center;">
+                ${getSigImgHTML(sigAuth, 'Authorised By')}
+              </div>
+            </div>
+          </div>
+
+          <!-- Inspected By -->
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+              <span style="font-size:9px;font-weight:700;color:#1e293b;white-space:nowrap;width:90px;">Inspected By:</span>
+              <span style="font-size:10px;font-weight:600;color:#0284c7;border-bottom:1px solid #cbd5e1;flex:1;min-width:100px;padding-bottom:1px;">${inspectedName}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:9px;font-weight:700;color:#1e293b;white-space:nowrap;width:90px;">Signature:</span>
+              <div style="border-bottom:1px solid #cbd5e1;flex:1;min-width:100px;height:36px;display:flex;align-items:center;justify-content:center;">
+                ${getSigImgHTML(sigInspect, 'Inspected By')}
+              </div>
+            </div>
+          </div>
+
+          <!-- Delivered By -->
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+              <span style="font-size:9px;font-weight:700;color:#1e293b;white-space:nowrap;width:90px;">Delivered By:</span>
+              <span style="font-size:10px;font-weight:600;color:#0284c7;border-bottom:1px solid #cbd5e1;flex:1;min-width:100px;padding-bottom:1px;">${deliveredName}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:9px;font-weight:700;color:#1e293b;white-space:nowrap;width:90px;">Signature:</span>
+              <div style="border-bottom:1px solid #cbd5e1;flex:1;min-width:100px;height:36px;display:flex;align-items:center;justify-content:center;">
+                ${getSigImgHTML(sigDelv, 'Delivered By')}
+              </div>
+            </div>
+          </div>
+
+          <!-- Received By -->
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+              <span style="font-size:9px;font-weight:700;color:#1e293b;white-space:nowrap;width:90px;">Received By:</span>
+              <span style="font-size:10px;font-weight:600;color:#0284c7;border-bottom:1px solid #cbd5e1;flex:1;min-width:100px;padding-bottom:1px;">${receivedName}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:9px;font-weight:700;color:#1e293b;white-space:nowrap;width:90px;">Signature:</span>
+              <div style="border-bottom:1px solid #cbd5e1;flex:1;min-width:100px;height:36px;display:flex;align-items:center;justify-content:center;">
+                ${getSigImgHTML(sigRecv, 'Received By')}
+              </div>
+            </div>
+          </div>
+        `;
       }
-    });
+    }
     
     // Update modal title
     const modalTitle = document.getElementById('receipt-modal-title');
