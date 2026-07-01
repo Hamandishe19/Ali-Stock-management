@@ -52,6 +52,7 @@
         color: black !important;
         padding: 0 !important;
       }
+
       /* --- REPORT PRINTING MODE --- */
       body.printing-report > * { display: none !important; }
       body.printing-report main { 
@@ -103,6 +104,7 @@
       body.printing-report .text-slate-300, body.printing-report .text-slate-400 {
         color: #1e293b !important;
       }
+
       @page {
         margin: 1.5cm;
         size: landscape;
@@ -116,6 +118,7 @@
 </head>
 <body class="relative overflow-x-hidden pb-12">
   <div class="glow-bg"></div>
+
   <!-- Header & Navbar -->
   <header class="glass-nav sticky top-0 z-40 px-6 py-4">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
@@ -130,6 +133,7 @@
           <p class="text-3xs tracking-widest text-slate-400 font-bold uppercase">STOCK MANAGEMENT</p>
         </div>
       </div>
+
       <!-- Navigation Menu -->
       <nav class="flex items-center space-x-1 bg-slate-950/45 p-1 rounded-xl border border-white/5">
         <a href="index.html" class="px-4 py-2 rounded-lg text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition">Dashboard</a>
@@ -142,6 +146,7 @@
         </a>
         <a href="history.html" class="px-4 py-2 rounded-lg text-sm font-semibold bg-sky-primary text-white shadow-lg transition">Logs</a>
       </nav>
+
       <!-- Network and User Selector controls -->
       <div class="flex items-center space-x-4">
         <div id="user-selector-container"></div>
@@ -154,14 +159,17 @@
       </div>
     </div>
   </header>
+
   <!-- Main Container -->
   <main class="max-w-7xl mx-auto px-6 mt-8">
+
     <!-- Print Only Header -->
     <div class="print-only print-header">
       <h1 class="text-2xl font-black tracking-widest text-slate-900">JDI STOCK MANAGEMENT SYSTEM</h1>
       <h2 class="text-sm font-bold text-slate-500 uppercase tracking-widest mt-1">Stock Transaction Audit Report</h2>
       <p id="print-report-meta" class="text-xs text-slate-400 mt-2 font-mono">Report details loader...</p>
     </div>
+
     <!-- Title and Action Bar -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 no-print">
       <div>
@@ -176,8 +184,10 @@
           </svg>
           <span>Print Report</span>
         </button>
+
       </div>
     </div>
+
     <!-- Search & Filter Ribbon -->
     <section class="glass p-4 rounded-2xl mb-8 border border-white/5 flex flex-col lg:flex-row items-end gap-4 no-print">
       
@@ -193,6 +203,7 @@
           <input type="text" id="history-search" placeholder="Type SKU name, supplier, operator..." class="w-full pl-10 pr-4 py-2 rounded-xl glass-input text-xs focus:outline-none">
         </div>
       </div>
+
       <!-- Direction Filter -->
       <div class="w-full md:w-44">
         <label class="block text-3xs font-extrabold text-slate-400 uppercase tracking-widest mb-1.5">Transaction Type</label>
@@ -202,16 +213,20 @@
           <option value="out">Stock Out (GIN)</option>
         </select>
       </div>
+
       <!-- Date Pickers -->
       <div class="w-full md:w-40">
         <label class="block text-3xs font-extrabold text-slate-400 uppercase tracking-widest mb-1.5">Start Date</label>
         <input type="date" id="history-start-date" class="w-full px-3 py-2 rounded-xl glass-input text-xs focus:outline-none cursor-pointer">
       </div>
+
       <div class="w-full md:w-40">
         <label class="block text-3xs font-extrabold text-slate-400 uppercase tracking-widest mb-1.5">End Date</label>
         <input type="date" id="history-end-date" class="w-full px-3 py-2 rounded-xl glass-input text-xs focus:outline-none cursor-pointer">
       </div>
+
     </section>
+
     <!-- Audit Ledger Table -->
     <section class="glass rounded-2xl border border-white/5 overflow-hidden mb-8">
       <div class="overflow-x-auto">
@@ -236,7 +251,9 @@
         </table>
       </div>
     </section>
+
   </main>
+
   <!-- MODAL: JDI Goods Received Voucher Receipt -->
   <div id="receipt-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm no-print">
     <div class="glass-modal rounded-3xl w-full max-w-3xl overflow-hidden border border-white/10 shadow-2xl flex flex-col max-h-[95vh]">
@@ -254,6 +271,7 @@
           </svg>
         </button>
       </div>
+
       <!-- GRV Receipt Body (Printable) -->
       <div id="grv-print-area" class="overflow-y-auto bg-white text-slate-900 font-sans" style="font-family: Arial, sans-serif;">
         
@@ -276,6 +294,7 @@
               <strong>F:</strong> 243-242-300037
             </div>
           </div>
+
           <!-- Right: Voucher Title + Number -->
           <div style="text-align:right; min-width:200px;">
             <div style="font-size:18px;font-weight:900;letter-spacing:2px;color:#1e293b;text-transform:uppercase;" id="receipt-type">GOODS RECEIVED VOUCHER</div>
@@ -283,6 +302,7 @@
             <div style="font-size:9px;color:#94a3b8;margin-top:2px;font-family:monospace;" id="receipt-id">JDI-GRV-0001</div>
           </div>
         </div>
+
         <!-- Memo / Date / Reference Row -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid #e2e8f0;padding:10px 24px;">
           <div>
@@ -304,6 +324,7 @@
             <span id="receipt-jt-orden" style="font-size:10px;font-weight:600;color:#1e293b;margin-left:6px;">—</span>
           </div>
         </div>
+
         <!-- Items Table -->
         <div style="padding:0 24px;">
           <table style="width:100%;border-collapse:collapse;font-size:10px;">
@@ -326,62 +347,28 @@
             <tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:6px;border-right:1px solid #e2e8f0;">&nbsp;</td><td style="border-right:1px solid #e2e8f0;"></td><td style="border-right:1px solid #e2e8f0;"></td><td style="border-right:1px solid #e2e8f0;"></td><td style="border-right:1px solid #e2e8f0;"></td><td></td></tr>
           </table>
         </div>
+
         <!-- Footer Reference Code -->
         <div style="text-align:right;padding:4px 24px;border-top:1px solid #e2e8f0;">
           <span style="font-size:8px;color:#94a3b8;font-family:monospace;" id="receipt-footer-code">JDI-GRV-01 (Rev. 0)</span>
         </div>
+
         <!-- Three-Party Signature Row -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:16px 24px;border-top:2px solid #1e293b;align-items:start;">
           
-          <!-- Left: 3 Signatures -->
-          <div style="display:flex;flex-direction:column;gap:12px;">
-            
-            <!-- Authorised By -->
-            <div>
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <span style="font-size:9px;font-weight:700;color:#1e293b;white-space:nowrap;width:90px;">Authorised By:</span>
-                <span id="receipt-authorised-name" style="font-size:10px;font-weight:600;color:#0284c7;border-bottom:1px solid #cbd5e1;flex:1;min-width:100px;padding-bottom:1px;">—</span>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;">
-                <span style="font-size:9px;font-weight:700;color:#1e293b;white-space:nowrap;width:90px;">Signature:</span>
-                <div id="receipt-sig-authorised-container" style="border-bottom:1px solid #cbd5e1;flex:1;min-width:100px;height:36px;display:flex;align-items:center;justify-content:center;">
-                  <img id="receipt-sig-authorised-img" style="max-height:34px;max-width:100%;filter:invert(1);" src="" alt="Authorised Signature" />
-                </div>
-              </div>
-            </div>
-            <!-- Received By -->
-            <div>
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <span style="font-size:9px;font-weight:700;color:#1e293b;white-space:nowrap;width:90px;">Received By:</span>
-                <span id="receipt-received-name" style="font-size:10px;font-weight:600;color:#0284c7;border-bottom:1px solid #cbd5e1;flex:1;min-width:100px;padding-bottom:1px;">—</span>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;">
-                <span style="font-size:9px;font-weight:700;color:#1e293b;white-space:nowrap;width:90px;">Signature:</span>
-                <div id="receipt-sig-received-container" style="border-bottom:1px solid #cbd5e1;flex:1;min-width:100px;height:36px;display:flex;align-items:center;justify-content:center;">
-                  <img id="receipt-sig-received-img" style="max-height:34px;max-width:100%;filter:invert(1);" src="" alt="Received Signature" />
-                </div>
-              </div>
-            </div>
-            <!-- Delivered By -->
-            <div>
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <span style="font-size:9px;font-weight:700;color:#1e293b;white-space:nowrap;width:90px;">Delivered By:</span>
-                <span id="receipt-delivered-name" style="font-size:10px;font-weight:600;color:#0284c7;border-bottom:1px solid #cbd5e1;flex:1;min-width:100px;padding-bottom:1px;">—</span>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;">
-                <span style="font-size:9px;font-weight:700;color:#1e293b;white-space:nowrap;width:90px;">Signature:</span>
-                <div id="receipt-sig-delivered-container" style="border-bottom:1px solid #cbd5e1;flex:1;min-width:100px;height:36px;display:flex;align-items:center;justify-content:center;">
-                  <img id="receipt-sig-delivered-img" style="max-height:34px;max-width:100%;filter:invert(1);" src="" alt="Delivered Signature" />
-                </div>
-              </div>
-            </div>
+          <!-- Left: Signatures Container (Populated dynamically) -->
+          <div id="receipt-signatures-container" style="display:flex;flex-direction:column;gap:12px;flex:1;">
           </div>
+
           <!-- Right: Official Stamp Box -->
           <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid #1e293b;border-radius:8px;padding:16px;min-height:120px;">
             <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#64748b;">OFFICIAL STAMP</span>
           </div>
+
         </div>
+
       </div>
+
       <!-- Controls -->
       <div class="px-6 py-4 bg-slate-900/60 border-t border-white/10 flex items-center justify-between shrink-0 no-print">
         <button onclick="printCurrentReceipt()" class="py-2 px-5 rounded-xl font-bold bg-sky-primary text-white border border-sky-400/20 hover:bg-sky-650 transition flex items-center space-x-2">
@@ -396,8 +383,10 @@
       </div>
     </div>
   </div>
+
   <!-- Toast Container -->
   <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 max-w-sm w-full font-sans"></div>
+
   <!-- Scripts -->
   <script src="db.js"></script>
   <script src="db-init-data.js"></script>
