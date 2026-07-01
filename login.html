@@ -21,12 +21,7 @@
     }
   </script>
   <link rel="stylesheet" href="shared.css">
-  <script>
-    // If already logged in, redirect to dashboard
-    if (localStorage.getItem('is_logged_in') === 'true') {
-      window.location.replace('index.html');
-    }
-  </script>
+  <script src="auth.js"></script>
 </head>
 <body class="relative overflow-x-hidden flex items-center justify-center min-height-screen py-16 px-4">
   <div class="glow-bg"></div>
@@ -67,7 +62,7 @@
       <div class="flex items-center justify-between">
         <label class="flex items-center space-x-2 text-xs text-slate-400 cursor-pointer select-none">
           <input type="checkbox" id="remember-me" class="rounded bg-slate-900 border-white/10 text-sky-primary focus:ring-sky-500">
-          <span>Stay signed in</span>
+          <span>Stay signed in (persists after browser close)</span>
         </label>
         
         <button type="button" id="open-enroll-btn" class="text-xs text-sky hover:text-sky-300 font-semibold focus:outline-none transition">
@@ -250,8 +245,7 @@
     });
 
     function executeLogin(remember) {
-      localStorage.setItem('is_logged_in', 'true');
-      localStorage.setItem('remember_me', remember ? 'true' : 'false');
+      window.Auth.setLoggedIn(remember);
       showLocalToast('Authentication successful. Redirecting...', 'success');
       setTimeout(() => {
         window.location.replace('index.html');
@@ -463,9 +457,11 @@
       navigator.credentials.create({ publicKey })
         .then(cred => {
           console.log("WebAuthn mock registration success:", cred);
-          localStorage.setItem('biometric_enrolled', 'true');
-          localStorage.setItem('biometric_type', 'webauthn');
-          showLocalToast('Native WebAuthn token registered successfully!', 'success');
+          if (window.Auth.saveWebAuthnCredential(cred)) {
+            showLocalToast('Native WebAuthn token registered successfully!', 'success');
+          } else {
+            showLocalToast('WebAuthn succeeded but credential could not be stored.', 'warning');
+          }
         })
         .catch(err => {
           console.error("WebAuthn registration failed/cancelled:", err);
@@ -499,11 +495,7 @@
     function executeWebAuthnLogin() {
       const challenge = new Uint8Array(32);
       window.crypto.getRandomValues(challenge);
-      const publicKey = {
-        challenge: challenge,
-        timeout: 60000,
-        rpId: window.location.hostname
-      };
+      const publicKey = window.Auth.buildWebAuthnGetOptions(challenge);
 
       navigator.credentials.get({ publicKey })
         .then(assertion => {
