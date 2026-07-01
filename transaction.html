@@ -22,12 +22,7 @@
     }
   </script>
   <link rel="stylesheet" href="shared.css">
-  <script>
-    // Auth Guard
-    if (localStorage.getItem('is_logged_in') !== 'true') {
-      window.location.replace('login.html');
-    }
-  </script>
+  <script src="auth.js"></script>
 </head>
 <body class="relative overflow-x-hidden pb-12">
   <div class="glow-bg"></div>
@@ -207,31 +202,31 @@
 
             <!-- Authorised By -->
             <div class="space-y-2">
-              <span class="block text-xs font-semibold text-slate-300">1. Authorised By *</span>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
-                  <label class="block text-xs font-semibold text-slate-400 mb-1">Name</label>
-                  <input type="text" id="grn-authorised-by" placeholder="Authorising Manager Name" required class="w-full px-3 py-2.5 rounded-lg glass-input text-sm focus:outline-none">
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-slate-400 mb-1">Staff PIN *</label>
-                  <input type="password" id="grn-auth-pin" placeholder="Enter PIN (1234)" required class="w-full px-3 py-2.5 rounded-lg glass-input text-sm focus:outline-none">
-                </div>
+              <span class="block text-xs font-semibold text-slate-300">1. Authorised By</span>
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Name</label>
+                <input type="text" id="grn-authorised-by" value="Mr S. I. Johnson" readonly class="w-full px-3 py-2.5 rounded-lg glass-input text-sm focus:outline-none bg-slate-900/60 text-slate-400 cursor-not-allowed">
               </div>
               <div id="authorised-sig-container" class="h-24 bg-slate-950/45 rounded-xl border border-white/5 flex flex-col items-center justify-center p-3 text-center cursor-pointer hover:border-sky-500/30 transition" onclick="openSignatureModal('authorised')">
-                <span class="text-3xs text-sky font-bold uppercase tracking-widest animate-pulse">Tap to Draw Authorised By Signature</span>
+                <span class="text-3xs text-sky font-bold uppercase tracking-widest animate-pulse">Tap to Draw Authorised By Signature (Optional)</span>
               </div>
             </div>
 
             <!-- Received By -->
             <div class="space-y-2">
               <span class="block text-xs font-semibold text-slate-300">2. Received By *</span>
-              <div>
-                <label class="block text-xs font-semibold text-slate-400 mb-1">Name</label>
-                <input type="text" id="grn-received-by" placeholder="Staff who received the goods" required class="w-full px-3 py-2.5 rounded-lg glass-input text-sm focus:outline-none">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-400 mb-1">Name</label>
+                  <input type="text" id="grn-received-by" value="Ali" readonly class="w-full px-3 py-2.5 rounded-lg glass-input text-sm focus:outline-none bg-slate-900/60 text-slate-400 cursor-not-allowed">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-400 mb-1">Ali's Staff PIN *</label>
+                  <input type="password" id="grn-auth-pin" placeholder="Enter Ali's PIN" required class="w-full px-3 py-2.5 rounded-lg glass-input text-sm focus:outline-none">
+                </div>
               </div>
               <div id="received-sig-container" class="h-24 bg-slate-950/45 rounded-xl border border-white/5 flex flex-col items-center justify-center p-3 text-center cursor-pointer hover:border-sky-500/30 transition" onclick="openSignatureModal('received')">
-                <span class="text-3xs text-sky font-bold uppercase tracking-widest animate-pulse">Tap to Draw Received By Signature</span>
+                <span class="text-3xs text-sky font-bold uppercase tracking-widest animate-pulse">Tap to Draw Received By Signature (Optional)</span>
               </div>
             </div>
 
@@ -243,7 +238,7 @@
                 <input type="text" id="grn-delivered-by" placeholder="e.g. Apex Industrial Supplies" required class="w-full px-3 py-2.5 rounded-lg glass-input text-sm focus:outline-none">
               </div>
               <div id="delivered-sig-container" class="h-24 bg-slate-950/45 rounded-xl border border-white/5 flex flex-col items-center justify-center p-3 text-center cursor-pointer hover:border-sky-500/30 transition" onclick="openSignatureModal('delivered')">
-                <span class="text-3xs text-sky font-bold uppercase tracking-widest animate-pulse">Tap to Draw Delivered By Signature</span>
+                <span class="text-3xs text-sky font-bold uppercase tracking-widest animate-pulse">Tap to Draw Delivered By Signature (Optional)</span>
               </div>
             </div>
 
@@ -284,31 +279,31 @@
 
             <!-- Authorised By (GIN) -->
             <div class="space-y-2">
-              <span class="block text-xs font-semibold text-slate-300">1. Authorised By *</span>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
-                  <label class="block text-xs font-semibold text-slate-400 mb-1">Name</label>
-                  <input type="text" id="gin-authorised-by" placeholder="Authorising Manager Name" required class="w-full px-3 py-2.5 rounded-lg glass-input text-sm focus:outline-none">
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-slate-400 mb-1">Staff PIN *</label>
-                  <input type="password" id="gin-auth-pin" placeholder="Enter PIN (1234)" required class="w-full px-3 py-2.5 rounded-lg glass-input text-sm focus:outline-none">
-                </div>
+              <span class="block text-xs font-semibold text-slate-300">1. Authorised By</span>
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Name</label>
+                <input type="text" id="gin-authorised-by" value="Mr S. I. Johnson" readonly class="w-full px-3 py-2.5 rounded-lg glass-input text-sm focus:outline-none bg-slate-900/60 text-slate-400 cursor-not-allowed">
               </div>
               <div id="gin-authorised-sig-container" class="h-24 bg-slate-950/45 rounded-xl border border-white/5 flex flex-col items-center justify-center p-3 text-center cursor-pointer hover:border-sky-500/30 transition" onclick="openSignatureModal('gin-authorised')">
-                <span class="text-3xs text-sky font-bold uppercase tracking-widest animate-pulse">Tap to Draw Authorised By Signature</span>
+                <span class="text-3xs text-sky font-bold uppercase tracking-widest animate-pulse">Tap to Draw Authorised By Signature (Optional)</span>
               </div>
             </div>
 
-            <!-- Received By (GIN) -->
+            <!-- Inspected By (GIN) -->
             <div class="space-y-2">
-              <span class="block text-xs font-semibold text-slate-300">2. Received By (Technician / Requester) *</span>
-              <div>
-                <label class="block text-xs font-semibold text-slate-400 mb-1">Name</label>
-                <input type="text" id="gin-received-by" placeholder="e.g. Dave Martinez (Plumber)" required class="w-full px-3 py-2.5 rounded-lg glass-input text-sm focus:outline-none">
+              <span class="block text-xs font-semibold text-slate-300">2. Inspected By *</span>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-400 mb-1">Name</label>
+                  <input type="text" id="gin-inspected-by" value="Ali" readonly class="w-full px-3 py-2.5 rounded-lg glass-input text-sm focus:outline-none bg-slate-900/60 text-slate-400 cursor-not-allowed">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-400 mb-1">Ali's Staff PIN *</label>
+                  <input type="password" id="gin-auth-pin" placeholder="Enter Ali's PIN" required class="w-full px-3 py-2.5 rounded-lg glass-input text-sm focus:outline-none">
+                </div>
               </div>
-              <div id="gin-received-sig-container" class="h-24 bg-slate-950/45 rounded-xl border border-white/5 flex flex-col items-center justify-center p-3 text-center cursor-pointer hover:border-sky-500/30 transition" onclick="openSignatureModal('gin-received')">
-                <span class="text-3xs text-sky font-bold uppercase tracking-widest animate-pulse">Tap to Draw Received By Signature</span>
+              <div id="gin-inspected-sig-container" class="h-24 bg-slate-950/45 rounded-xl border border-white/5 flex flex-col items-center justify-center p-3 text-center cursor-pointer hover:border-sky-500/30 transition" onclick="openSignatureModal('gin-inspected')">
+                <span class="text-3xs text-sky font-bold uppercase tracking-widest animate-pulse">Tap to Draw Inspected By Signature (Optional)</span>
               </div>
             </div>
 
@@ -320,7 +315,19 @@
                 <input type="text" id="gin-delivered-by" placeholder="Staff who issued the goods" required class="w-full px-3 py-2.5 rounded-lg glass-input text-sm focus:outline-none">
               </div>
               <div id="gin-delivered-sig-container" class="h-24 bg-slate-950/45 rounded-xl border border-white/5 flex flex-col items-center justify-center p-3 text-center cursor-pointer hover:border-sky-500/30 transition" onclick="openSignatureModal('gin-delivered')">
-                <span class="text-3xs text-sky font-bold uppercase tracking-widest animate-pulse">Tap to Draw Delivered By Signature</span>
+                <span class="text-3xs text-sky font-bold uppercase tracking-widest animate-pulse">Tap to Draw Delivered By Signature (Optional)</span>
+              </div>
+            </div>
+
+            <!-- Received By (GIN) -->
+            <div class="space-y-2">
+              <span class="block text-xs font-semibold text-slate-300">4. Received By (Technician / Requester) *</span>
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Name</label>
+                <input type="text" id="gin-received-by" placeholder="e.g. Dave Martinez (Plumber)" required class="w-full px-3 py-2.5 rounded-lg glass-input text-sm focus:outline-none">
+              </div>
+              <div id="gin-received-sig-container" class="h-24 bg-slate-950/45 rounded-xl border border-white/5 flex flex-col items-center justify-center p-3 text-center cursor-pointer hover:border-sky-500/30 transition" onclick="openSignatureModal('gin-received')">
+                <span class="text-3xs text-sky font-bold uppercase tracking-widest animate-pulse">Tap to Draw Received By Signature (Optional)</span>
               </div>
             </div>
 
